@@ -71,10 +71,60 @@ public:
   }
 
   /// Dereference operator
-  // MyIterator& operator*() { return *this; }
+  MyIterator& operator*() { return *current; }
 
   /// Difference between iterators
-  // MyIterator operator-(const MyIterator& other) {}
+  MyIterator operator-(const MyIterator& other) {
+    auto block_diff = std::distance(other.block, this->block);
+    auto diff_to_end = std::distance(this->current, this->block.end());
+    auto diff_to_start = std::distance(other.block.begin(), other.current);
+    return diff_to_end + (block_diff - 1) * BlockSize
+           + diff_to_start;  // returns the distance [this, other)
+  }
+
+  /// Right sum of iterator and integer
+  friend MyIterator operator+(int n, MyIterator it) {
+    auto current_index = std::distance(it.block->begin(), it.current);
+    auto total_index = current_index + n;
+    auto blocks_to_advance = total_index / BlockSize;
+    std::advance(it.block, blocks_to_advance);
+    std::advance(it.current, total_index % BlockSize);
+    return it;
+  }
+
+  /// Left sum of iterator and integer
+  friend MyIterator operator+(MyIterator it, int n) { return n + it; }
+
+  /// Addition assignment operator
+  MyIterator& operator+=(int n) { return *this = *this + n; }
+
+  /// Difference assignment operator
+  MyIterator& operator-=(int n) { return *this = *this - n; }
+
+  /// Right Difference of iterator and integer
+  friend MyIterator operator-(int n, MyIterator it) { return it + (-n); }
+
+  /// If a iterator is a lower position than another iterator, with lexicographic order
+  bool operator<(const MyIterator& other) const {
+    return block < other.block or (block == other.block and current < other.current);
+  }
+
+  /// If a iterator is a greater position than another iterator, with lexicographic order
+  bool operator>(const MyIterator& other) const { return other < *this; }
+
+  /// If a iterator is in the same position then another
+  bool operator==(const MyIterator& other) const {
+    return block == other.block and current == other.current;
+  }
+
+  /// If a iterator is in a lower or equal position then another
+  bool operator<=(const MyIterator& other) const { return *this < other or *this == other; }
+
+  /// If a iterator is in a greater or equal position then another
+  bool operator>=(const MyIterator& other) const { return *this > other or *this == other; }
+
+  /// If a iterator is in a different position then another
+  bool operator!=(const MyIterator& other) const { return not(*this == other); }
 
 private:
   BlockItr block;   //!< The block the iterator points to.
