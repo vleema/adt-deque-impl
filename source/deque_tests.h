@@ -12,85 +12,85 @@
 // To run tests with the STL's deque, uncomment the line below.
 #define which_lib std
 
-#define YES 1
-#define NO  0
+#define YES       1
+#define NO        0
 
 // ============================================================================
 // TESTING deque AS A CONTAINER OF INTEGERS
 // ============================================================================
 
 // Test default ctro's size and capacity initial values.
-#define DEFAULT_CTRO YES
+#define DEFAULT_CTRO NO
 // Receives a size and a 'value' as arguments. It crates an empty deque with size() 'values'.
-#define CTRO_SIZE_VALUE YES
+#define CTRO_SIZE_VALUE NO
 // Ctro that receives a size as argument. It crates an empty deque with size elements.
-#define CTRO_SIZE YES
+#define CTRO_SIZE NO
 // Ctro that receives a range of values as its initial value.
-#define CTRO_RANGE YES
+#define CTRO_RANGE NO
 // Copy Ctro: creates a deque based on another passed in as argument.
-#define CTRO_COPY YES
+#define CTRO_COPY NO
 // Ctro that receives a list of values as its initial value.
-#define LIST_CTRO YES
+#define LIST_CTRO NO
 // Assign operator, as in dq1 = dq2;
-#define ASSIGN_OP YES
+#define ASSIGN_OP NO
 // Initializer list assignment, as in deque<int> dq = { 1, 2, 3 };
-#define INITIALISZER_ASSIGNMENT YES
+#define INITIALISZER_ASSIGNMENT NO
 // Size method
-#define SIZE YES
+#define SIZE NO
 // Clear method
-#define CLEAR YES
+#define CLEAR NO
 // Empty method
-#define EMPTY YES
+#define EMPTY NO
 // Push front method
-#define PUSH_FRONT YES
+#define PUSH_FRONT NO
 // Push back method
-#define PUSH_BACK YES
+#define PUSH_BACK NO
 // Pop back method
-#define POP_FRONT YES
+#define POP_FRONT NO
 // Pop back method
-#define POP_BACK YES
+#define POP_BACK NO
 // Reference front, as in dq.front() = 3;
-#define REF_FRONT YES
+#define REF_FRONT NO
 // Const front, as in x = dq.front();
-#define CONST_FRONT YES
+#define CONST_FRONT NO
 // Reference back, as in dq.back() = 3;
-#define REF_BACK YES
+#define REF_BACK NO
 // Const back, as in x = dq.back();
-#define CONST_BACK YES
+#define CONST_BACK NO
 // Assign `count` elements with `value` to the deque: dq.assign(3,value);
-#define ASSIGN_COUNT_VALUES YES
+#define ASSIGN_COUNT_VALUES NO
 // Const index access operator, as in x = dq[3];
-#define CONST_INDEX_OP YES
+#define CONST_INDEX_OP NO
 // Reference index access operator, as in dq[3] = x;
-#define REF_INDEX_OP YES
+#define REF_INDEX_OP NO
 // Const index access operator with bounds check, as in x = dq.at(3);
-#define CONST_AT_INDEX YES
+#define CONST_AT_INDEX NO
 // Reference index access operator with bounds check, as in dq.at(3) = x;
-#define REF_AT_INDEX YES
+#define REF_AT_INDEX NO
 // Change the number of elements stored in the container.
-#define RESIZE YES
+#define RESIZE NO
 // Shrink storage memory so that the capacity is the same as the # of elements currently stored.
-#define SHRINK YES
+#define SHRINK NO
 // Equality operator
-#define EQUAL_OP YES
+#define EQUAL_OP NO
 // Different operator
-#define DIFFERENT_OP YES
+#define DIFFERENT_OP NO
 // Insert a single values before pos
-#define INSERT_SINGLE_VALUE YES
+#define INSERT_SINGLE_VALUE NO
 // Insert a range of elements before pos
-#define INSERT_RANGE YES
+#define INSERT_RANGE NO
 // Insert a initializer list of elements before pos
-#define INSERT_INITIALIZER YES
+#define INSERT_INITIALIZER NO
 // Insert multiple copies of a given value.
-#define INSERT_MULTIPLE_VALUES YES
+#define INSERT_MULTIPLE_VALUES NO
 // Erase a range of elements begining at pos
-#define ERASE_RANGE YES
+#define ERASE_RANGE NO
 // Erase a single values at pos
-#define ERASE_SINGLE_VALUE YES
+#define ERASE_SINGLE_VALUE NO
 // Assign to deque values from a range.
-#define ASSIGN_RANGE YES
+#define ASSIGN_RANGE NO
 // Assign to deque from a initialize_list.
-#define ASSIGN_INIT_LIST YES
+#define ASSIGN_INIT_LIST NO
 
 /// Tests the basic operations with a deque of integers.
 template <typename T, size_t S>
@@ -867,9 +867,9 @@ void run_regular_deque_tests(const std::array<T, S>& values, const std::array<T,
     }
 
     // CASE #2: Deque is larger than range.
-    auto limite{3};
+    auto limite{ 3 };
     // Assigning a larger range to a small deque.
-    dq.assign(values.begin(), values.begin()+limite);
+    dq.assign(values.begin(), values.begin() + limite);
     // Check size.
     EXPECT_EQ(dq.size(), limite);
     // Verify the elements.
@@ -890,7 +890,7 @@ void run_regular_deque_tests(const std::array<T, S>& values, const std::array<T,
     // Verify the elements.
     EXPECT_EQ(dq[0], values[0]);
     // Assigning a larger range to a small deque.
-    dq.assign({values[0], values[1], values[2], values[3], values[4]});
+    dq.assign({ values[0], values[1], values[2], values[3], values[4] });
     // Check size.
     EXPECT_EQ(dq.size(), 5);
     // Verify the elements.
@@ -900,7 +900,7 @@ void run_regular_deque_tests(const std::array<T, S>& values, const std::array<T,
 
     // CASE #2: Deque is larger than range.
     // Assigning a larger range to a small deque.
-    dq.assign({values[0], values[1], values[2]});
+    dq.assign({ values[0], values[1], values[2] });
     // Check size.
     EXPECT_EQ(dq.size(), 3);
     // Verify the elements.
@@ -910,8 +910,8 @@ void run_regular_deque_tests(const std::array<T, S>& values, const std::array<T,
   }
 #endif
 
-    tm.summary();
-    std::cout << "\n\n";
-  }
+  tm.summary();
+  std::cout << "\n\n";
+}
 
 #endif

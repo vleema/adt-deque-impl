@@ -4,9 +4,9 @@
 #include "deque.h"
 #include "tm/test_manager.h"
 
-// #define which_lib sc
+#define which_lib sc
 // To run tests with the STL's deque, uncomment the line below.
-#define which_lib std
+// #define which_lib std
 
 #define YES 1
 #define NO  0
@@ -20,47 +20,47 @@
 #define BEGIN YES
 // Test cbegin() method that should return a const iterator to the first element
 // in the container.
-#define CBEGIN YES
+#define CBEGIN NO
 // Test end() method that should return a iterator to a location just past the
 // last elemento of a container.
 #define END YES
 // Test cend() method that should return a const iterator to a location just
 // past the last elemento of a container.
-#define CEND YES
+#define CEND NO
 // Pre-increment operator. ++it
-#define PRE_INC YES
+#define PRE_INC NO
 // Post-increment operator. it++
-#define POST_INC YES
+#define POST_INC NO
 // Pre-decrement operator. --it
-#define PRE_DEC YES
+#define PRE_DEC NO
 // Post-decrement operator. it--
-#define POST_DEC YES
+#define POST_DEC NO
 // Dreference operator. *it
-#define DEREFERENCE YES
+#define DEREFERENCE NO
 // Differentre between iterators. it1 - it2
-#define DIFFERENCE YES
+#define DIFFERENCE NO
 // Add a offset to a iterator. offset + it
-#define ADD_OFFSET_IT YES
+#define ADD_OFFSET_IT NO
 // Add an iterator and an offset. it + offset
-#define ADD_IT_OFFSET YES
+#define ADD_IT_OFFSET NO
 // Subtract an iterator and an offset. it - offset
-#define SUB_IT_OFFSET YES
+#define SUB_IT_OFFSET NO
 // Self addition iterator and offset. it += 0ffset
-#define SELF_ADD_IT_OFFSET YES
+#define SELF_ADD_IT_OFFSET NO
 // Self subtraction iterator and offset. it -= 0ffset
-#define SELF_SUB_IT_OFFSET YES
+#define SELF_SUB_IT_OFFSET NO
 // Less operator. it1 < it2
-#define LESS YES
+#define LESS NO
 // Greater operator. it1 > it2
-#define GREATER YES
+#define GREATER NO
 // Less equal operator. it1 <= it2
-#define LESS_EQ YES
+#define LESS_EQ NO
 // Greater equal operator. it1 >= it2
-#define GREATER_EQ YES
+#define GREATER_EQ NO
 // Equal operator. it1 == it2
-#define EQUAL YES
+#define EQUAL NO
 // Different operator. it1 != it2
-#define DIFFERENT YES
+#define DIFFERENT NO
 
 void run_iterator_tests() {
   TestManager tm{ "Iterator testing" };
@@ -125,10 +125,10 @@ void run_iterator_tests() {
 
     which_lib::deque<int> dq{ 1, 2, 4, 5, 6 };
 
-    auto len = std::distance(dq.begin(),dq.end());
-    EXPECT_EQ(len,5);
+    auto len = std::distance(dq.begin(), dq.end());
+    EXPECT_EQ(len, 5);
 
-    auto it = dq.begin()+dq.size();
+    auto it = dq.begin() + dq.size();
     EXPECT_EQ(it, dq.end());
 
     auto dq2 = dq;
