@@ -19,9 +19,11 @@ namespace sc {
 // Forward declaration. This is necessary so that we can state
 // that deque is a friend of MyIterator.
 // Inside deque we need access to the private members of MyIterator.
-template <typename T, size_t BlockSize = 3, size_t DefaultBlkMapSize = 1> class deque;
+template <typename T, size_t BlockSize = 3, size_t DefaultBlkMapSize = 1>
+class deque;
 
-template <typename T, size_t BlockSize, typename BlockItr, typename ItemItr> class MyIterator {
+template <typename T, size_t BlockSize, typename BlockItr, typename ItemItr>
+class MyIterator {
 public:
   //== Typical iterator aliases
   using iterator_category = std::random_access_iterator_tag;
@@ -33,6 +35,7 @@ public:
 
   /// Default constructor
   MyIterator() = default;
+  /// Copy constructor
 
 private:
   BlockItr block;   //!< The block the iterator points to.
@@ -42,7 +45,8 @@ private:
   friend class deque<T>;
 };
 
-template <typename T, size_t BlockSize, size_t DefaultBlkMapSize> class deque {
+template <typename T, size_t BlockSize, size_t DefaultBlkMapSize>
+class deque {
 public:
   //== Typical container aliases
   using size_type = unsigned long;            //!< The size type.
@@ -77,8 +81,8 @@ private:
   size_t m_map_size{ DefaultBlkMapSize };  //!< Current length of the map.
 
 public:
-  /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is not
-   *  provided, a default constructor `T()` is used.
+  /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is
+   * not provided, a default constructor `T()` is used.
    */
   deque(size_type n = 0, const_reference value = T()) {}
 
