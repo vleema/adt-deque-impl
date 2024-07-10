@@ -1,17 +1,13 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
-#include <algorithm>  // std::copy, std::equal, std::fill
-#include <cassert>    // assert()
-#include <cstddef>    // std::size_t
-#include <iostream>   // std::cout, std::endl
-#include <iterator>   // std::advance, std::begin(), std::end(), std::ostream_iterator
-#include <memory>     // std::unique_ptr
+#include <cassert>   // assert()
+#include <cstddef>   // std::size_t
+#include <iterator>  // std::advance, std::begin(), std::end(), std::ostream_iterator
+#include <memory>    // std::unique_ptr
 using std::shared_ptr;
 #include <array>
-#include <sstream>
 #include <vector>
-#include <initializer_list>  // std::initializer_list
 
 /// Sequence container namespace.
 namespace sc {
@@ -36,6 +32,49 @@ public:
   /// Default constructor
   MyIterator() = default;
   /// Copy constructor
+  MyIterator(const MyIterator& other) = default;
+  /// Copy assignment operator
+  MyIterator& operator=(const MyIterator& other) = default;
+
+  /// Pre-Increment operator
+  MyIterator& operator++() {
+    ++current;
+    if (current == block->end()) {
+      ++block;
+      current = block->begin();
+    }
+    return *this;
+  }
+
+  /// Post-Increment operator
+  MyIterator operator++(int) {
+    MyIterator temp(*this);
+    ++(*this);
+    return temp;
+  }
+
+  /// Pre-Decrement operator
+  MyIterator& operator--() {
+    if (current == block->begin()) {
+      --block;
+      current = block->end();
+    }
+    --current;
+    return *this;
+  }
+
+  /// Post-Decrement operator
+  MyIterator operator--(int) {
+    MyIterator temp(*this);
+    --(*this);
+    return temp;
+  }
+
+  /// Dereference operator
+  // MyIterator& operator*() { return *this; }
+
+  /// Difference between iterators
+  // MyIterator operator-(const MyIterator& other) {}
 
 private:
   BlockItr block;   //!< The block the iterator points to.
@@ -96,10 +135,10 @@ public:
   [[nodiscard]] bool empty() const { return m_count == 0; }
 
   /// Return an iterator to the deque's first element.
-  iterator begin() { return iterator(); }
+  iterator begin() { return m_head_itr.current; }
 
   /// Return an iterator to a location following the deque's last element.
-  iterator end() { return iterator(); }
+  iterator end() { return m_head_itr.current; }
 
   /// Insert `value` at the begining of the deque.
   void push_front(const_reference value) { m_count++; }
