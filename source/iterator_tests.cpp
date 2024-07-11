@@ -17,13 +17,13 @@
 
 // Test begin() method that should return a iterator to the first element in the
 // container.
-#define BEGIN YES
+#define BEGIN NO
 // Test cbegin() method that should return a const iterator to the first element
 // in the container.
 #define CBEGIN NO
 // Test end() method that should return a iterator to a location just past the
 // last elemento of a container.
-#define END YES
+#define END NO
 // Test cend() method that should return a const iterator to a location just
 // past the last elemento of a container.
 #define CEND NO

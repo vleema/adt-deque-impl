@@ -1,14 +1,14 @@
 #include <array>
 #include <cstdlib>
-#include <iostream>
 #include <deque>
+#include <iostream>
 
 #include "deque_tests.h"
 #include "tm/test_manager.h"
 
-// #define which_lib sc
+#define which_lib sc
 // To run tests with the STL's deque, uncomment the line below.
-#define which_lib std
+// #define which_lib std
 
 #define YES 1
 #define NO  0

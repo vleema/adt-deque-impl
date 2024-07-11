@@ -8,12 +8,12 @@
 
 #include "deque.h"
 
-// #define which_lib sc
+#define which_lib sc
 // To run tests with the STL's deque, uncomment the line below.
-#define which_lib std
+// #define which_lib std
 
-#define YES       1
-#define NO        0
+#define YES 1
+#define NO  0
 
 // ============================================================================
 // TESTING deque AS A CONTAINER OF INTEGERS
@@ -22,7 +22,7 @@
 // Test default ctro's size and capacity initial values.
 #define DEFAULT_CTRO NO
 // Receives a size and a 'value' as arguments. It crates an empty deque with size() 'values'.
-#define CTRO_SIZE_VALUE NO
+#define CTRO_SIZE_VALUE YES
 // Ctro that receives a size as argument. It crates an empty deque with size elements.
 #define CTRO_SIZE NO
 // Ctro that receives a range of values as its initial value.
