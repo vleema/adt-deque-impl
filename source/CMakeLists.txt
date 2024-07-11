@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 project ( Deque VERSION 1.0 LANGUAGES CXX )
 
-  #=== CREATING COMPILING DATABASE ===#
+#=== CREATING COMPILING DATABASE === #
 # Currently CMake (since 2.8.5) supports generation of compilation databases
 # for Unix Makefile builds (Ninja builds in the works) with the option
 # CMAKE_EXPORT_COMPILE_COMMANDS.
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-#=== SETTING VARIABLES ===#
+#=== SETTING VARIABLES === #
 # Appending to existing flags the correct way (two methods)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra  -g3 -O0")
 
 # Using TestManager Library
 # [1] Compile the TestManagere first into a lib.
