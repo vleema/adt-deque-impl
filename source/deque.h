@@ -216,10 +216,6 @@ public:
 
   /// Insert `value` at the end of the deque.
   void push_back(const_reference value) {
-    // If the deque is empty, we need to create the first block.
-    // If the tail iterator is at the end of the block, we need to create a new block and update
-    // Then we insert the value at the end of the block, and update the tail iterator.
-    // Also, we need to update the count of elements in the deque.
     if (empty()) {
       _M_mob->push_back(std::make_shared<block_t>());
       _M_head_itr = _M_tail_itr = iterator(_M_mob->begin(), (*_M_mob->begin())->begin());
