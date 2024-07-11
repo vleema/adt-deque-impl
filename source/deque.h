@@ -5,6 +5,7 @@
 #include <cstddef>   // std::size_t
 #include <iterator>  // std::advance, std::begin(), std::end(), std::ostream_iterator
 #include <memory>    // std::unique_ptr
+#include <type_traits>
 using std::shared_ptr;
 #include <array>
 #include <vector>
@@ -47,8 +48,7 @@ public:  //== Typical iterator aliases
   ~MyIterator() = default;
   /// Pre-Increment operator
   MyIterator& operator++() {
-    ++_M_current;
-    if (_M_current == (*_M_block)->end()) {
+    if (++_M_current == (*_M_block)->end()) {
       ++_M_block;
       _M_current = (*_M_block)->begin();
     }
@@ -64,9 +64,9 @@ public:  //== Typical iterator aliases
 
   /// Pre-Decrement operator
   MyIterator& operator--() {
-    if (_M_current == _M_block->begin()) {
+    if (_M_current == (*_M_block)->begin()) {
       --_M_block;
-      _M_current = _M_block->end();
+      _M_current = (*_M_block)->end();
     }
     --_M_current;
     return *this;
@@ -96,7 +96,7 @@ public:  //== Typical iterator aliases
 
   /// Right sum of iterator and integer
   friend MyIterator operator+(int n, MyIterator it) {
-    auto current_index = std::distance(it._M_block->begin(), it._M_current);
+    auto current_index = std::distance((*it._M_block)->begin(), it._M_current);
     auto total_index = current_index + n;
     auto blocks_to_advance = total_index / BlockSize;
     std::advance(it._M_block, blocks_to_advance);
@@ -196,6 +196,23 @@ public:
     }
   }
 
+  /// Construct a deque from a range of elements [first, last).
+  template <typename InputIt,
+            typename = typename std::enable_if<!std::is_integral<InputIt>::value>::type>
+  deque(InputIt first, InputIt last) : deque() {
+    for (InputIt it = first; it != last; ++it) {
+      push_back(*it);
+    }
+  }
+
+  ~deque() = default;
+
+  /// Construct a deque from an initializer list.
+  deque(std::initializer_list<T> il) : deque(il.begin(), il.end()) {}
+
+  /// Copy constructor.
+  deque(const deque& other) : deque(other.begin(), other.end()) {}
+
   /// Clear the deque of all elements by resetting the control iterators to middle of the map.
   void clear() {}
 
@@ -239,7 +256,7 @@ public:
 
   /// Returns a reference to the element at specified location `pos`. No bounds checking is
   /// performed.
-  reference operator[](size_type idx) { return nullptr; }
+  reference operator[](size_type idx) { return *(_M_head_itr + idx); }
 
   [[nodiscard]] std::string to_string() const { return "hi"; }
 };
