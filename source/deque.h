@@ -1,8 +1,10 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
-#include <cassert>   // assert()
-#include <cstddef>   // std::size_t
+#include <algorithm>
+#include <cassert>  // assert()
+#include <cstddef>  // std::size_t
+#include <iostream>
 #include <iterator>  // std::advance, std::begin(), std::end(), std::ostream_iterator
 #include <memory>    // std::unique_ptr
 #include <type_traits>
@@ -48,10 +50,12 @@ public:  //== Typical iterator aliases
   ~MyIterator() = default;
   /// Pre-Increment operator
   MyIterator& operator++() {
-    if (++_M_current == (*_M_block)->end()) {
+    if (_M_current == (*_M_block)->end() - 1) {
       ++_M_block;
       _M_current = (*_M_block)->begin();
+      return *this;
     }
+    ++_M_current;
     return *this;
   }
 
@@ -63,14 +67,7 @@ public:  //== Typical iterator aliases
   }
 
   /// Pre-Decrement operator
-  MyIterator& operator--() {
-    if (_M_current == (*_M_block)->begin()) {
-      --_M_block;
-      _M_current = (*_M_block)->end();
-    }
-    --_M_current;
-    return *this;
-  }
+  MyIterator& operator--() { return *this -= 1; }  // FIX: No way this shit i working
 
   /// Post-Decrement operator
   MyIterator operator--(int) {
@@ -107,15 +104,14 @@ public:  //== Typical iterator aliases
   /// Left sum of iterator and integer
   friend MyIterator operator+(MyIterator it, int n) { return n + it; }
 
+  /// Right Difference of iterator and integer
+  friend MyIterator operator-(int n, MyIterator it) { return it + (-n); }
+
   /// Addition assignment operator
   MyIterator& operator+=(int n) { return *this = *this + n; }
 
   /// Difference assignment operator
-  MyIterator& operator-=(int n) { return *this = *this - n; }
-
-  /// Right Difference of iterator and integer
-  friend MyIterator operator-(int n, MyIterator it) { return it + (-n); }
-
+  MyIterator& operator-=(int n) { return *this += -n; }
   /// If a iterator is a lower position than another iterator, with lexicographic order
   bool operator<(const MyIterator& other) const {
     return _M_block < other._M_block
@@ -182,18 +178,43 @@ private:
   size_t _M_count{ 0 };                     //!< # of elements stored in the map.
   size_t _M_map_size{ DefaultBlkMapSize };  //!< Current length of the map.
 
+  void reallocate(size_t new_map_size) {
+    if (new_map_size < _M_map_size) {
+      return;
+    }
+    std::shared_ptr<block_list_t> new_mob(std::make_shared<block_list_t>(new_map_size));
+    for (size_t i = 0; i < _M_map_size; ++i) {
+      new_mob->at(i) = _M_mob->at(i);
+    }
+    _M_mob = new_mob;
+    _M_map_size = new_map_size;
+    _M_head_itr._M_block = _M_mob->begin();
+    _M_head_itr._M_current = (*_M_head_itr._M_block)->begin();
+    _M_tail_itr._M_block = _M_mob->begin();
+    _M_tail_itr._M_current = (*_M_tail_itr._M_block)->end();
+  }
+
 public:
   /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is
    * not provided, a default constructor `T()` is used.
    */
   explicit deque(size_type n = 0, const_reference value = T())
       : _M_mob(std::make_shared<block_list_t>()), _M_head_itr(), _M_tail_itr(), _M_count(0) {
+    _M_mob->push_back(std::make_shared<block_t>());
     if (n == 0) {
       return;
     }
-    for (size_type i = 0; i < n; ++i) {
-      push_back(value);
+    _M_count = n;
+    size_t n_blocks = (n + BlockSize - 1) / BlockSize;
+    for (size_t i = 0; i < n_blocks; ++i) {
+      _M_mob->push_back(std::make_shared<block_t>());
     }
+    _M_head_itr._M_block = _M_mob->begin();
+    _M_head_itr._M_current = (*_M_head_itr._M_block)->begin();
+    _M_tail_itr._M_block = _M_mob->begin() + n_blocks;
+    _M_tail_itr._M_current = (*_M_tail_itr._M_block)->begin() + n % BlockSize;
+    std::fill(begin(), end(), value);
+    _M_map_size = n_blocks;
   }
 
   /// Construct a deque from a range of elements [first, last).
@@ -226,22 +247,22 @@ public:
   iterator begin() { return _M_head_itr; }
 
   /// Return an iterator to a location following the deque's last element.
-  iterator end() { return _M_head_itr; }
+  iterator end() { return _M_tail_itr; }
 
   /// Insert `value` at the begining of the deque.
   void push_front(const_reference value) { _M_count++; }
 
   /// Insert `value` at the end of the deque.
   void push_back(const_reference value) {
-    if (empty()) {
+    if (_M_count == _M_mob->size() * BlockSize) {
+      reallocate(_M_map_size * 2);
+    }
+    if (_M_tail_itr._M_current == (*_M_tail_itr._M_block)->end()) {
       _M_mob->push_back(std::make_shared<block_t>());
-      _M_head_itr = _M_tail_itr = iterator(_M_mob->begin(), (*_M_mob->begin())->begin());
-    } else if (_M_tail_itr._M_current == (*_M_tail_itr._M_block)->end()) {
-      _M_mob->push_back(std::make_shared<block_t>());
-      _M_tail_itr = iterator(_M_mob->end() - 1, _M_mob->back()->begin());
+      _M_tail_itr._M_block = _M_mob->end() - 1;
+      _M_tail_itr._M_current = (*_M_tail_itr._M_block)->begin();
     }
     *_M_tail_itr._M_current = value;
-    _M_tail_itr._M_current++;
     _M_count++;
   }
 
