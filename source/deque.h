@@ -34,15 +34,15 @@ public:  //== Typical iterator aliases
   /// Default constructor
   MyIterator() = default;
   /// Constructor with block and item iterators
-  MyIterator(BlockItr block, ItemItr current) : _M_block(block), _M_current(current) {}
+  MyIterator(BlockItr block, ItemItr current) : M_block(block), M_current(current) {}
   /// Copy constructor
   MyIterator(const MyIterator& other)
-      : _M_block(BlockItr(other._M_block)), _M_current(ItemItr(other._M_current)) {}
+      : M_block(BlockItr(other.M_block)), M_current(ItemItr(other.M_current)) {}
   /// Copy assignment operator
   MyIterator& operator=(const MyIterator& other) {
     if (this != &other) {
-      _M_block = BlockItr(other._M_block);
-      _M_current = ItemItr(other._M_current);
+      M_block = BlockItr(other.M_block);
+      M_current = ItemItr(other.M_current);
     }
     return *this;
   }
@@ -50,12 +50,12 @@ public:  //== Typical iterator aliases
   ~MyIterator() = default;
   /// Pre-Increment operator
   MyIterator& operator++() {
-    if (_M_current == (*_M_block)->end() - 1) {
-      ++_M_block;
-      _M_current = (*_M_block)->begin();
+    if (M_current == (*M_block)->end() - 1) {
+      ++M_block;
+      M_current = (*M_block)->begin();
       return *this;
     }
-    ++_M_current;
+    ++M_current;
     return *this;
   }
 
@@ -67,7 +67,7 @@ public:  //== Typical iterator aliases
   }
 
   /// Pre-Decrement operator
-  MyIterator& operator--() { return *this -= 1; }  // FIX: No way this shit i working
+  MyIterator& operator--() { return *this -= 1; }  // FIX: No way this shit it working
 
   /// Post-Decrement operator
   MyIterator operator--(int) {
@@ -77,27 +77,27 @@ public:  //== Typical iterator aliases
   }
 
   /// Dereference operator
-  reference operator*() { return *_M_current; }
+  reference operator*() { return *M_current; }
 
   /// Arrow operator
-  pointer operator->() { return &(*_M_current); }
+  pointer operator->() { return &(*M_current); }
 
   /// Difference between iterators
   difference_type operator-(const MyIterator& other) {
-    auto block_diff = std::distance(other._M_block, this->_M_block);
-    auto diff_to_end = std::distance(this->_M_current, (*this->_M_block)->end());
-    auto diff_to_start = std::distance((*other._M_block)->begin(), other._M_current);
+    auto block_diff = std::distance(other.M_block, this->M_block);
+    auto diff_to_end = std::distance(this->M_current, (*this->M_block)->end());
+    auto diff_to_start = std::distance((*other.M_block)->begin(), other.M_current);
     return diff_to_end + (block_diff - 1) * BlockSize
            + diff_to_start;  // returns the distance [this, other)
   }
 
   /// Right sum of iterator and integer
   friend MyIterator operator+(int n, MyIterator it) {
-    auto current_index = std::distance((*it._M_block)->begin(), it._M_current);
+    auto current_index = std::distance((*it.M_block)->begin(), it.M_current);
     auto total_index = current_index + n;
     auto blocks_to_advance = total_index / BlockSize;
-    std::advance(it._M_block, blocks_to_advance);
-    std::advance(it._M_current, total_index % BlockSize);
+    std::advance(it.M_block, blocks_to_advance);
+    std::advance(it.M_current, total_index % BlockSize);
     return it;
   }
 
@@ -114,8 +114,7 @@ public:  //== Typical iterator aliases
   MyIterator& operator-=(int n) { return *this += -n; }
   /// If a iterator is a lower position than another iterator, with lexicographic order
   bool operator<(const MyIterator& other) const {
-    return _M_block < other._M_block
-           or (_M_block == other._M_block and _M_current < other._M_current);
+    return M_block < other.M_block or (M_block == other.M_block and M_current < other.M_current);
   }
 
   /// If a iterator is a greater position than another iterator, with lexicographic order
@@ -123,7 +122,7 @@ public:  //== Typical iterator aliases
 
   /// If a iterator is in the same position then another
   bool operator==(const MyIterator& other) const {
-    return _M_block == other._M_block and _M_current == other._M_current;
+    return M_block == other.M_block and M_current == other.M_current;
   }
 
   /// If a iterator is in a lower or equal position then another
@@ -136,8 +135,8 @@ public:  //== Typical iterator aliases
   bool operator!=(const MyIterator& other) const { return not(*this == other); }
 
 private:
-  BlockItr _M_block;   //!< The block the iterator points to.
-  ItemItr _M_current;  //!< The last location where an insertion happened inside the block.
+  BlockItr M_block;   //!< The block the iterator points to.
+  ItemItr M_current;  //!< The last location where an insertion happened inside the block.
 
   // We need to grant this friendship to allow deque access to the iterator's private attributes.
   friend class deque<T>;
@@ -172,58 +171,56 @@ public:
 
 private:
   //== Management variables.
-  std::shared_ptr<block_list_t> _M_mob;     //!< The dynamic map of blocks.
-  iterator _M_head_itr;                     //!< Iterator to the head block.
-  iterator _M_tail_itr;                     //!< Iterator to the tail block.
-  size_t _M_count{ 0 };                     //!< # of elements stored in the map.
-  size_t _M_map_size{ DefaultBlkMapSize };  //!< Current length of the map.
+  std::shared_ptr<block_list_t> M_mob;     //!< The dynamic map of blocks.
+  iterator M_head_itr;                     //!< Iterator to the head block.
+  iterator M_tail_itr;                     //!< Iterator to the tail block.
+  size_t M_count{ 0 };                     //!< # of elements stored in the map.
+  size_t M_map_size{ DefaultBlkMapSize };  //!< Current length of the map.
 
-  void reallocate(size_t new_map_size) {
-    if (new_map_size < _M_map_size) {
-      return;
+  void allocate_all_blocks() {
+    for (auto& block : *M_mob) {
+      block = std::make_shared<block_t>();
     }
-    std::shared_ptr<block_list_t> new_mob(std::make_shared<block_list_t>(new_map_size));
-    for (size_t i = 0; i < _M_map_size; ++i) {
-      new_mob->at(i) = _M_mob->at(i);
-    }
-    _M_mob = new_mob;
-    _M_map_size = new_map_size;
-    _M_head_itr._M_block = _M_mob->begin();
-    _M_head_itr._M_current = (*_M_head_itr._M_block)->begin();
-    _M_tail_itr._M_block = _M_mob->begin();
-    _M_tail_itr._M_current = (*_M_tail_itr._M_block)->end();
+  }
+
+  void reset() {
+    auto middle_block_itr = std::next(M_mob->begin(), M_map_size / 2);
+    auto current_middle_itr = std::next((*middle_block_itr)->begin(), BlockSize / 2);
+    M_head_itr = M_tail_itr = iterator(middle_block_itr, current_middle_itr);
+    M_count = 0;
+  }
+
+  template <typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
+  void initialize_from_range(InputIt first, InputIt last) {
+    auto num_values = std::distance(first, last);
+    M_map_size = (num_values + BlockSize) / BlockSize;
+    M_mob = std::make_shared<block_list_t>(M_map_size, nullptr);
+    allocate_all_blocks();
+    M_head_itr = iterator(M_mob->begin(), (*M_mob->begin())->begin());
+    M_tail_itr = M_head_itr + num_values;
+    std::copy(first, last, M_head_itr);
+    M_count = num_values;
   }
 
 public:
-  /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is
-   * not provided, a default constructor `T()` is used.
-   */
-  explicit deque(size_type n = 0, const_reference value = T())
-      : _M_mob(std::make_shared<block_list_t>()), _M_head_itr(), _M_tail_itr(), _M_count(0) {
-    _M_mob->push_back(std::make_shared<block_t>());
-    if (n == 0) {
-      return;
-    }
-    _M_count = n;
-    size_t n_blocks = (n + BlockSize - 1) / BlockSize;
-    for (size_t i = 0; i < n_blocks; ++i) {
-      _M_mob->push_back(std::make_shared<block_t>());
-    }
-    _M_head_itr._M_block = _M_mob->begin();
-    _M_head_itr._M_current = (*_M_head_itr._M_block)->begin();
-    _M_tail_itr._M_block = _M_mob->begin() + n_blocks;
-    _M_tail_itr._M_current = (*_M_tail_itr._M_block)->begin() + n % BlockSize;
-    std::fill(begin(), end(), value);
-    _M_map_size = n_blocks;
+  /// Default Constructor.
+  deque() {
+    M_mob = std::make_shared<block_list_t>(M_map_size, nullptr);
+    allocate_all_blocks();
+    reset();
+  }
+
+  /// Construct a deque with `count` copies of `value`.
+  deque(size_type count, const_reference value = T()) {
+    const std::vector<value_type> temp(count, value);
+    initialize_from_range(temp.cbegin(), temp.cend());
   }
 
   /// Construct a deque from a range of elements [first, last).
   template <typename InputIt,
             typename = typename std::enable_if<!std::is_integral<InputIt>::value>::type>
-  deque(InputIt first, InputIt last) : deque() {
-    for (InputIt it = first; it != last; ++it) {
-      push_back(*it);
-    }
+  deque(InputIt first, InputIt last) {
+    initialize_from_range(first, last);
   }
 
   ~deque() = default;
@@ -238,46 +235,35 @@ public:
   void clear() {}
 
   /// Return the number of elements in the deque.
-  [[nodiscard]] size_type size() const { return _M_count; }
+  [[nodiscard]] size_type size() const { return M_count; }
 
   /// Return `true` if the deque has no elements, `false` otherwise.
-  [[nodiscard]] bool empty() const { return _M_count == 0; }
+  [[nodiscard]] bool empty() const { return M_count == 0; }
 
   /// Return an iterator to the deque's first element.
-  iterator begin() { return _M_head_itr; }
+  iterator begin() { return M_head_itr; }
 
   /// Return an iterator to a location following the deque's last element.
-  iterator end() { return _M_tail_itr; }
+  iterator end() { return M_tail_itr; }
 
   /// Insert `value` at the begining of the deque.
-  void push_front(const_reference value) { _M_count++; }
+  void push_front(const_reference value) { M_count++; }
 
   /// Insert `value` at the end of the deque.
-  void push_back(const_reference value) {
-    if (_M_count == _M_mob->size() * BlockSize) {
-      reallocate(_M_map_size * 2);
-    }
-    if (_M_tail_itr._M_current == (*_M_tail_itr._M_block)->end()) {
-      _M_mob->push_back(std::make_shared<block_t>());
-      _M_tail_itr._M_block = _M_mob->end() - 1;
-      _M_tail_itr._M_current = (*_M_tail_itr._M_block)->begin();
-    }
-    *_M_tail_itr._M_current = value;
-    _M_count++;
-  }
+  void push_back(const_reference value) {}
 
   /// Remove the first element of the deque.
-  void pop_front() { _M_count--; }
+  void pop_front() { M_count--; }
 
   /// Remove the last element of the deque.
-  void pop_back() { _M_count--; }
+  void pop_back() { M_count--; }
 
   /// Inserts the value at location pointed by `pos`.
   iterator insert(const_iterator pos, const_reference value) {}
 
   /// Returns a reference to the element at specified location `pos`. No bounds checking is
   /// performed.
-  reference operator[](size_type idx) { return *(_M_head_itr + idx); }
+  reference operator[](size_type idx) { return *(M_head_itr + idx); }
 
   [[nodiscard]] std::string to_string() const { return "hi"; }
 };
