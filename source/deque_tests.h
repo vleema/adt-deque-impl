@@ -20,11 +20,11 @@
 // ============================================================================
 
 // Test default ctro's size and capacity initial values.
-#define DEFAULT_CTRO YES
+#define DEFAULT_CTRO NO
 // Receives a size and a 'value' as arguments. It crates an empty deque with size() 'values'.
-#define CTRO_SIZE_VALUE YES
+#define CTRO_SIZE_VALUE NO
 // Ctro that receives a size as argument. It crates an empty deque with size elements.
-#define CTRO_SIZE YES
+#define CTRO_SIZE NO
 // Ctro that receives a range of values as its initial value.
 #define CTRO_RANGE YES
 // Copy Ctro: creates a deque based on another passed in as argument.

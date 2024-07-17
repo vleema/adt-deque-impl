@@ -97,7 +97,7 @@ public:  //== Typical iterator aliases
     auto total_index = current_index + n;
     auto blocks_to_advance = total_index / BlockSize;
     std::advance(it.M_block, blocks_to_advance);
-    std::advance(it.M_current, total_index % BlockSize);
+    it.M_current = std::next((*it.M_block)->begin(), total_index % BlockSize);
     return it;
   }
 
