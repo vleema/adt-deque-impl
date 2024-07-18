@@ -67,7 +67,7 @@ public:  //== Typical iterator aliases
   }
 
   /// Pre-Decrement operator
-  MyIterator& operator--() { return *this -= 1; }  // FIX: No way this shit it working
+  MyIterator& operator--() { return *this -= 1; }
 
   /// Post-Decrement operator
   MyIterator operator--(int) {
@@ -84,11 +84,16 @@ public:  //== Typical iterator aliases
 
   /// Difference between iterators
   difference_type operator-(const MyIterator& other) {
-    auto block_diff = std::distance(other.M_block, this->M_block);
-    auto diff_to_end = std::distance(this->M_current, (*this->M_block)->end());
-    auto diff_to_start = std::distance((*other.M_block)->begin(), other.M_current);
-    return diff_to_end + (block_diff - 1) * BlockSize
-           + diff_to_start;  // returns the distance [this, other)
+    if (*this <= other) {
+      return 0;
+    }
+    if (M_block == other.M_block) {
+      return std::distance(other.M_current, M_current);
+    }
+    auto block_diff = std::distance(other.M_block, M_block);
+    auto this_to_end = std::distance(M_current, (*M_block)->end());
+    auto other_to_end = std::distance(other.M_current, (*other.M_block)->end());
+    return (other_to_end + block_diff * BlockSize) - this_to_end;
   }
 
   /// Right sum of iterator and integer
@@ -217,8 +222,7 @@ public:
   }
 
   /// Construct a deque from a range of elements [first, last).
-  template <typename InputIt,
-            typename = typename std::enable_if<!std::is_integral<InputIt>::value>::type>
+  template <typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
   deque(InputIt first, InputIt last) {
     initialize_from_range(first, last);
   }
