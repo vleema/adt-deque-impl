@@ -28,7 +28,7 @@
 // past the last elemento of a container.
 #define CEND NO
 // Pre-increment operator. ++it
-#define PRE_INC NO
+#define PRE_INC YES
 // Post-increment operator. it++
 #define POST_INC NO
 // Pre-decrement operator. --it
@@ -40,13 +40,13 @@
 // Differentre between iterators. it1 - it2
 #define DIFFERENCE NO
 // Add a offset to a iterator. offset + it
-#define ADD_OFFSET_IT NO
+#define ADD_OFFSET_IT YES
 // Add an iterator and an offset. it + offset
 #define ADD_IT_OFFSET NO
 // Subtract an iterator and an offset. it - offset
-#define SUB_IT_OFFSET YES
+#define SUB_IT_OFFSET NO
 // Self addition iterator and offset. it += 0ffset
-#define SELF_ADD_IT_OFFSET NO
+#define SELF_ADD_IT_OFFSET YES
 // Self subtraction iterator and offset. it -= 0ffset
 #define SELF_SUB_IT_OFFSET NO
 // Less operator. it1 < it2
@@ -182,6 +182,7 @@ void run_iterator_tests() {
     size_t i{ 0 };
     while (it != dq.end()) {
       EXPECT_EQ(*it, dq[i++]);
+      ++it;
     }
   }
 #endif
