@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>  // assert()
 #include <cstddef>  // std::size_t
+#include <cstdlib>
 #include <iostream>
 #include <iterator>  // std::advance, std::begin(), std::end(), std::ostream_iterator
 #include <memory>    // std::unique_ptr
@@ -49,15 +50,7 @@ public:  //== Typical iterator aliases
   /// Default destructor
   ~MyIterator() = default;
   /// Pre-Increment operator
-  MyIterator& operator++() {
-    if (M_current == (*M_block)->end() - 1) {
-      ++M_block;
-      M_current = (*M_block)->begin();
-      return *this;
-    }
-    ++M_current;
-    return *this;
-  }
+  MyIterator& operator++() { return *this += 1; }
 
   /// Post-Increment operator
   MyIterator operator++(int) {
@@ -110,13 +103,29 @@ public:  //== Typical iterator aliases
   friend MyIterator operator+(MyIterator it, int n) { return n + it; }
 
   /// Right Difference of iterator and integer
-  friend MyIterator operator-(int n, MyIterator it) { return it + (-n); }
+  friend MyIterator operator-(MyIterator it, int n) {
+    auto current_index = std::distance((*it.M_block)->begin(), it.M_current);
+    // If is within the same block, just move back the iterator
+    if (current_index >= n) {
+      it.M_current = std::prev(it.M_current, n);
+      return it;
+    }
+    // If the difference is greater than the current block, calculates how many blocks to move back
+    auto blocks_to_move = (n - current_index) / BlockSize;
+    blocks_to_move += (n - current_index) % BlockSize == 0 ? 0 : 1;
+    auto remaining_distance = n - current_index;
+    it.M_block = std::prev(it.M_block, blocks_to_move);
+    it.M_current = std::prev((*it.M_block)->end(), remaining_distance);
+
+    return it;
+  }
 
   /// Addition assignment operator
   MyIterator& operator+=(int n) { return *this = *this + n; }
 
   /// Difference assignment operator
-  MyIterator& operator-=(int n) { return *this += -n; }
+  MyIterator& operator-=(int n) { return *this = *this - n; }
+
   /// If a iterator is a lower position than another iterator, with lexicographic order
   bool operator<(const MyIterator& other) const {
     return M_block < other.M_block or (M_block == other.M_block and M_current < other.M_current);
@@ -233,10 +242,10 @@ public:
   deque(std::initializer_list<T> il) : deque(il.begin(), il.end()) {}
 
   /// Copy constructor.
-  deque(const deque& other) : deque(other.begin(), other.end()) {}
+  deque(const deque& other) : deque(other.cbegin(), other.cend()) {}
 
   /// Clear the deque of all elements by resetting the control iterators to middle of the map.
-  void clear() {}
+  void clear() { reset(); }
 
   /// Return the number of elements in the deque.
   [[nodiscard]] size_type size() const { return M_count; }
@@ -249,6 +258,12 @@ public:
 
   /// Return an iterator to a location following the deque's last element.
   iterator end() { return M_tail_itr; }
+
+  /// Reruns a const interator to the deque's first element.
+  const iterator cbegin() const { return M_head_itr; }
+
+  /// Reruns a const interator to the deque's last element.
+  const iterator cend() const { return M_tail_itr; }
 
   /// Insert `value` at the begining of the deque.
   void push_front(const_reference value) { M_count++; }

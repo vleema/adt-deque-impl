@@ -26,7 +26,7 @@
 // Ctro that receives a size as argument. It crates an empty deque with size elements.
 #define CTRO_SIZE NO
 // Ctro that receives a range of values as its initial value.
-#define CTRO_RANGE YES
+#define CTRO_RANGE NO
 // Copy Ctro: creates a deque based on another passed in as argument.
 #define CTRO_COPY NO
 // Ctro that receives a list of values as its initial value.

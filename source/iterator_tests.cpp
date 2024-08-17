@@ -44,7 +44,7 @@
 // Add an iterator and an offset. it + offset
 #define ADD_IT_OFFSET NO
 // Subtract an iterator and an offset. it - offset
-#define SUB_IT_OFFSET NO
+#define SUB_IT_OFFSET YES
 // Self addition iterator and offset. it += 0ffset
 #define SELF_ADD_IT_OFFSET NO
 // Self subtraction iterator and offset. it -= 0ffset
@@ -181,12 +181,8 @@ void run_iterator_tests() {
     auto it = dq.begin();
     size_t i{ 0 };
     while (it != dq.end()) {
-      // same address
-      // EXPECT_EQ(*it, dq[i++]);
-      ++it;
-      std::cout << *it << " ";
+      EXPECT_EQ(*it, dq[i++]);
     }
-    std::cout << "\n";
   }
 #endif
 
